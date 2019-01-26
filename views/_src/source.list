@@ -1,0 +1,16 @@
+HEADERS += darqoinapi_createView.moc
+SOURCES += darqoinapi_createView.cpp
+HEADERS += darqoinapi_indexView.moc
+SOURCES += darqoinapi_indexView.cpp
+HEADERS += darqoinapi_saveView.moc
+SOURCES += darqoinapi_saveView.cpp
+HEADERS += darqoinapi_showView.moc
+SOURCES += darqoinapi_showView.cpp
+
+# include view files in the project
+views.files += ../darqoinapi/create.erb
+views.files += ../darqoinapi/index.erb
+views.files += ../darqoinapi/save.erb
+views.files += ../darqoinapi/show.erb
+views.path = .dummy
+INSTALLS += views

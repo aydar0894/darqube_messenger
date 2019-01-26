@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<%#include "darqoinapi.h" %>
+<% tfetch(QVariantMap, darqoinApi); %>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title><%= controller()->name() + ": " + controller()->activeAction() %></title>
+</head>
+<body>
+<p style="color: red"><%=$ error %></p>
+<p style="color: green"><%=$ notice %></p>
+
+<h1>New Darqoin Api</h1>
+
+<%== formTag(urla("create"), Tf::Post) %>
+  <p>
+    <label>Api Ver<br /><input name="darqoinApi[apiVer]" value="<%= darqoinApi["apiVer"] %>" /></label>
+  </p>
+  <p>
+    <input type="submit" value="Create" />
+  </p>
+</form>
+
+<%== linkTo("Back", urla("index")) %>
+
+</body>
+</html>

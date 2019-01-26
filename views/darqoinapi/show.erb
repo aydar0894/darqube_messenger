@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<%#include "darqoinapi.h" %>
+<% tfetch(DarqoinApi, darqoinApi); %>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title><%= controller()->name() + ": " + controller()->activeAction() %></title>
+</head>
+<body>
+<p style="color: red"><%=$ error %></p>
+<p style="color: green"><%=$ notice %></p>
+
+<h1>Showing Darqoin Api</h1>
+<dt>ID</dt><dd><%= darqoinApi.id() %></dd><br />
+<dt>Api Ver</dt><dd><%= darqoinApi.apiVer() %></dd><br />
+
+<%== linkTo("Edit", urla("save", darqoinApi.id())) %> |
+<%== linkTo("Back", urla("index")) %>
+
+</body>
+</html>

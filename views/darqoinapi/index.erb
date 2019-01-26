@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<%#include "darqoinapi.h" %>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title><%= controller()->name() + ": " + controller()->activeAction() %></title>
+</head>
+<body>
+
+<h1>Listing Darqoin Api</h1>
+
+<%== linkTo("Create a new Darqoin Api", urla("create")) %><br />
+<br />
+<table border="1" cellpadding="5" style="border: 1px #d0d0d0 solid; border-collapse: collapse;">
+  <tr>
+    <th>ID</th>
+    <th>Api Ver</th>
+  </tr>
+<% tfetch(QList<DarqoinApi>, darqoinApiList); %>
+<% for (const auto &i : darqoinApiList) { %>
+  <tr>
+    <td><%= i.id() %></td>
+    <td><%= i.apiVer() %></td>
+    <td>
+      <%== linkTo("Show", urla("show", i.id())) %>
+      <%== linkTo("Edit", urla("save", i.id())) %>
+      <%== linkTo("Remove", urla("remove", i.id()), Tf::Post, "confirm('Are you sure?')") %>
+    </td>
+  </tr>
+<% } %>
+</table>
+
+</body>
+</html>
