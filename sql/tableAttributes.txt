@@ -1,0 +1,1 @@
+wallet turnover_24(BTC) turnover_24(USD) balance(BTC) balanece(USD) change_24(BTC) change_24(USD)

@@ -1,0 +1,1 @@
+address  cur.balance   last_transaction_time   change(USD)
