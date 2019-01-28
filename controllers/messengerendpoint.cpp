@@ -44,6 +44,7 @@ void MessengerEndpoint::onTextReceived(const QString & text)
     else if(action == "get_user_chats")
     {
       QVariantMap result = getUserChats(sender);
+      result["type"] = "get_user_chats";
       QJsonDocument res = QJsonDocument::fromVariant(result);
       QString strJson(res.toJson(QJsonDocument::Compact));
       foreach (QVariant key, result.keys())
@@ -77,6 +78,8 @@ void MessengerEndpoint::onTextReceived(const QString & text)
       messagesCriteria["messages"] = updObject;
       pushCriteria["$push"] = messagesCriteria;
       chatsQ.update(criteria, pushCriteria, true);
+      pushCriteria["id"] = id;
+      pushCriteria["type"] = "new_message";
       QJsonDocument res = QJsonDocument::fromVariant(pushCriteria);
       QString strJson(res.toJson(QJsonDocument::Compact));
       publish(id, strJson);
@@ -98,7 +101,7 @@ void MessengerEndpoint::onTextReceived(const QString & text)
       messagesCriteria["messages"] = QStringList();
       messagesCriteria["users"] = messageBody["users"].toString().split(",");
       pushCriteria["$set"] = messagesCriteria;
-
+      pushCriteria["type"] = "create_group_chat";
       chatsQ.update(nameCriteria, pushCriteria, true);
       QJsonDocument res = QJsonDocument::fromVariant(pushCriteria);
       QString strJson(res.toJson(QJsonDocument::Compact));
@@ -119,6 +122,8 @@ void MessengerEndpoint::onTextReceived(const QString & text)
       pushCriteria["$push"] = eachCriteria;
 
       chatsQ.update(idCriteria, pushCriteria, true);
+      pushCriteria["type"] = "add_users_to_chat";
+      pushCriteria["id"] = id;
       QJsonDocument res = QJsonDocument::fromVariant(pushCriteria);
       QString strJson(res.toJson(QJsonDocument::Compact));
     }
@@ -138,6 +143,8 @@ void MessengerEndpoint::onTextReceived(const QString & text)
       pushCriteria["$pull"] = eachCriteria;
 
       chatsQ.update(idCriteria, pushCriteria, true);
+      pushCriteria["type"] = "remove_user_from_chat";
+      pushCriteria["id"] = id;
       QJsonDocument res = QJsonDocument::fromVariant(pushCriteria);
       QString strJson(res.toJson(QJsonDocument::Compact));
     }
