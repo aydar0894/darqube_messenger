@@ -21,7 +21,7 @@ QVariantMap getUserChats(QString userId)
   QVariantMap chats;
   QVariantMap chatCriteria;
   chatCriteria["users"] = userId;
-  QStringList list = { "users", "messages"};
+  QStringList list = { "name", "users", "messages"};
 
   chatsQ.find(chatCriteria, QVariantMap(), list);
   int iter = 1;
@@ -30,6 +30,6 @@ QVariantMap getUserChats(QString userId)
     chats.insert(doc["_id"].toString(), doc);
     iter++;
   }
-  
+
   return chats;
 }

@@ -2,6 +2,9 @@
 #include "messagegetters.h"
 #include <QMap>
 
+
+QMap<QString, QString> logged_in_users;
+
 MessengerEndpoint::MessengerEndpoint()
     : ApplicationEndpoint()
 { }
@@ -25,7 +28,7 @@ void MessengerEndpoint::onTextReceived(const QString & text)
     QString sender = message["sender"].toString();
     QString strJson(QJsonDocument(message["body"].toObject()).toJson(QJsonDocument::Compact));
     QJsonDocument body = QJsonDocument(message["body"].toObject());
-    tInfo(text.toUtf8());
+
 
 
     if(action == "login")
@@ -38,9 +41,9 @@ void MessengerEndpoint::onTextReceived(const QString & text)
       QString strJson(res.toJson(QJsonDocument::Compact));
       foreach (QVariant key, chats.keys())
       {
-        tInfo(key.toString().toUtf8());
         subscribe(key.toString());
       }
+      logged_in_users[sender] = QString(socketId());
       sendText(socketId(), strJson);
     }
 
@@ -54,7 +57,6 @@ void MessengerEndpoint::onTextReceived(const QString & text)
       QString strJson(res.toJson(QJsonDocument::Compact));
       foreach (QVariant key, chats.keys())
       {
-        tInfo(key.toString().toUtf8());
         subscribe(key.toString());
       }
       sendText(socketId(), strJson);
@@ -65,7 +67,6 @@ void MessengerEndpoint::onTextReceived(const QString & text)
       QJsonDocument messageBody = body;
 
       QString id = messageBody["id"].toString();
-      tInfo(id.toUtf8());
       TMongoQuery chatsQ("chats");
       QVariantMap criteria;
       criteria["_id"] = id;
@@ -95,23 +96,35 @@ void MessengerEndpoint::onTextReceived(const QString & text)
       QJsonDocument messageBody = body;
 
       TMongoQuery chatsQ("chats");
-      QVariantMap result;
-      QVariantMap updObject;
-      QVariantMap messagesCriteria;
-      QVariantMap pushCriteria;
-      QVariantMap setCriteria;
-      QVariantMap eachCriteria;
-      QVariantMap nameCriteria;
-      nameCriteria["name"] = messageBody["chatName"].toString();
-      messagesCriteria["messages"] = QStringList();
-      messagesCriteria["users"] = messageBody["users"].toString().split(",");
-      pushCriteria["$set"] = messagesCriteria;
-      chatsQ.update(nameCriteria, pushCriteria, true);
 
-      pushCriteria["name"] = messageBody["chatName"].toString();
-      pushCriteria["type"] = "create_group_chat";
-      QJsonDocument res = QJsonDocument::fromVariant(pushCriteria);
+      QVariantMap messagesCriteria;
+      QVariantMap result;
+      messagesCriteria["name"] = messageBody["chatName"].toString();
+      messagesCriteria["messages"] = QStringList();
+      QStringList users = messageBody["users"].toString().split(",");
+      messagesCriteria["users"] = users;
+      QString id;
+
+
+      QStringList list = {"_id"};
+
+      chatsQ.insert(messagesCriteria);
+      QVariantMap res_find = chatsQ.findOne(messagesCriteria , list);
+      id = res_find["_id"].toString();
+      // tInfo("ID:  ");
+      // tInfo(id.toUtf8());
+      result["data"] = messagesCriteria;
+      result["type"] = "create_group_chat";
+      QJsonDocument res = QJsonDocument::fromVariant(result);
       QString strJson(res.toJson(QJsonDocument::Compact));
+      for(int i = 0; i < users.length(); i++){
+        if(logged_in_users.contains(users[i]) && users[i] != sender){
+          sendText(logged_in_users[users[i]].toInt(), strJson);
+        }
+      }
+
+      subscribe(id);
+      publish(id, strJson);
     }
 
     else if(action == "add_users_to_chat")
