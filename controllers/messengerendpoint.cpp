@@ -105,8 +105,9 @@ void MessengerEndpoint::onTextReceived(const QString & text)
       nameCriteria["name"] = messageBody["chatName"].toString();
       messagesCriteria["messages"] = QStringList();
       messagesCriteria["users"] = messageBody["users"].toString().split(",");
-      chatsQ.update(nameCriteria, pushCriteria, true);
       pushCriteria["$set"] = messagesCriteria;
+      chatsQ.update(nameCriteria, pushCriteria, true);
+
       pushCriteria["name"] = messageBody["chatName"].toString();
       pushCriteria["type"] = "create_group_chat";
       QJsonDocument res = QJsonDocument::fromVariant(pushCriteria);
