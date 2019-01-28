@@ -126,7 +126,7 @@ void MessengerEndpoint::onTextReceived(const QString & text)
       subscribe(id);
       publish(id, strJson);
     }
-    
+
     else if(action == "add_users_to_chat")
     {
       QJsonDocument messageBody = body;
@@ -159,9 +159,12 @@ void MessengerEndpoint::onTextReceived(const QString & text)
       QVariantMap idCriteria;
       QVariantMap pushCriteria;
       QVariantMap eachCriteria;
+      QVariantMap usersCriteria;
+
 
       idCriteria["_id"] = id;
-      eachCriteria["users"] = messageBody["users"].toString().split(",");
+      eachCriteria["$each"] = messageBody["users"].toString().split(",");
+      usersCriteria["users"] = eachCriteria;
       pushCriteria["$pull"] = eachCriteria;
 
       chatsQ.update(idCriteria, pushCriteria, true);
