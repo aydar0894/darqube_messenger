@@ -30,10 +30,13 @@ void MessengerEndpoint::onTextReceived(const QString & text)
 
     if(action == "login")
     {
-      QVariantMap result = getUserChats(sender);
+      QVariantMap result;
+      QVariantMap chats = getUserChats(sender);
+      result["type"] = "get_user_chats";
+      result["data"] = chats;
       QJsonDocument res = QJsonDocument::fromVariant(result);
       QString strJson(res.toJson(QJsonDocument::Compact));
-      foreach (QVariant key, result.keys())
+      foreach (QVariant key, chats.keys())
       {
         tInfo(key.toString().toUtf8());
         subscribe(key.toString());
@@ -49,7 +52,7 @@ void MessengerEndpoint::onTextReceived(const QString & text)
       result["data"] = chats;
       QJsonDocument res = QJsonDocument::fromVariant(result);
       QString strJson(res.toJson(QJsonDocument::Compact));
-      foreach (QVariant key, result.keys())
+      foreach (QVariant key, chats.keys())
       {
         tInfo(key.toString().toUtf8());
         subscribe(key.toString());
@@ -104,6 +107,7 @@ void MessengerEndpoint::onTextReceived(const QString & text)
       messagesCriteria["users"] = messageBody["users"].toString().split(",");
       chatsQ.update(nameCriteria, pushCriteria, true);
       pushCriteria["$set"] = messagesCriteria;
+      pushCriteria["name"] = messageBody["chatName"].toString();
       pushCriteria["type"] = "create_group_chat";
       QJsonDocument res = QJsonDocument::fromVariant(pushCriteria);
       QString strJson(res.toJson(QJsonDocument::Compact));
